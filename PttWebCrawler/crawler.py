@@ -10,6 +10,7 @@ import requests
 import argparse
 import time
 import codecs
+from random import randint
 from bs4 import BeautifulSoup
 from six import u
 
@@ -57,6 +58,12 @@ class PttWebCrawler(object):
                 self.parse_article(article_id, board)
 
     def parse_articles(self, start, end, board, path='.', timeout=3):
+            _last_page = self.getLastPage(board)
+            if start < 0:
+                start = _last_page + start + 1
+            if end < 0:
+                end = _last_page + end + 1
+
             filename = board + '-' + str(start) + '-' + str(end) + '.json'
             filename = os.path.join(path, filename)
             self.store(filename, u'{"articles": [', 'w')
@@ -84,7 +91,7 @@ class PttWebCrawler(object):
                             self.store(filename, self.parse(link, article_id, board) + ',\n', 'a')
                     except:
                         pass
-                time.sleep(0.1)
+                time.sleep(randint(1, 3))
             self.store(filename, u']}', 'a')
             return filename
 
